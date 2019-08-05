@@ -6,3 +6,5 @@
 config.txt
 
 *.gz
+
+packages/rTorch\.examples\.Rcheck/
