@@ -1,0 +1,58 @@
+title: rTorch.examples
+url: https://github.com/f0nzie/rTorch.examples
+
+template:
+  params:
+    bootswatch: cosmo
+
+reference:
+  - title: All
+    desc: ~
+    contents:
+      - '`all_dims`'
+      - '`rTorch`'
+      - '`shape`'
+      - '`torch_extract_opts`'
+      - '`torch_getLogger`'
+      - '`torch_size`'
+      - all.torch.Tensor
+      - any.torch.Tensor
+      - log.torch.Tensor
+      - log10.torch.Tensor
+      - log2.torch.Tensor
+      - '`%%.torch.Tensor`'
+
+
+  - title: Generics
+    desc: ~
+    contents:
+      - '`%.*%`'
+      - '`%**%`'
+      - '`[.torch.Tensor`'
+
+  - title: One tensor operation
+    contents:
+      - '`dim.torch.Tensor`'
+      - '`length.torch.Tensor`'
+      - '`exp.torch.Tensor`'
+
+  - title: Two tensor operations
+    decs: ~
+    contents:
+      tensor_ops
+
+  - title: Get datasets
+    desc: ~
+    contents:
+      - '`dataset_mnist_digits`'
+
+  - title: Modules
+    desc: ~
+    contents:
+      - '`np`'
+      - '`torch`'
+      - '`torchvision`'
+
+
+
+
