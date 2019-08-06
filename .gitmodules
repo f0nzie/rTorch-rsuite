@@ -1,6 +1,10 @@
 [submodule "packages/rTorch"]
 	path = packages/rTorch
 	url = https://github.com/f0nzie/rTorch
+[submodule "packages/rTorch.examples"]
+	path = packages/rTorch.examples
+	url = https://github.com/f0nzie/rTorch.examples
 [submodule "packages/tensorflow"]
 	path = packages/tensorflow
 	url = https://github.com/f0nzie/tensorflow
+	
