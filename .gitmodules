@@ -4,3 +4,6 @@
 [submodule "packages/tensorflow"]
 	path = packages/tensorflow
 	url = https://github.com/f0nzie/tensorflow
+[submodule "projects/rTorch.examples"]
+	path = projects/rTorch.examples
+	url = https://github.com/f0nzie/rTorch.examples.git
