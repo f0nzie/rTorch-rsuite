@@ -1,0 +1,16 @@
+Package: rtorch.tf.pkgs
+Type: Package
+Title: What the package does (short line)
+Version: 0.1
+Date: 2019-09-10
+Author: msfz751
+Maintainer: Who to complain to <yourfault@somewhere.net>
+Description: More about what it does (maybe more than one line)
+License: What license is it under?
+Imports: logging,
+    readr,
+    dplyr,
+    caret,
+    MASS,
+    tfestimators
+RoxygenNote: 6.1.1

@@ -1,0 +1,9 @@
+MNIST-data
+*checkpoint.h5
+model.h5
+*.csv
+tflogs
+tb_logs
+weights
+digit_*.jpeg
+digit2.jpeg
