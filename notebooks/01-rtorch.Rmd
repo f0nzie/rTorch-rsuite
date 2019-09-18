@@ -1,0 +1,17 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(rTorch)
+
+torch_version()
+```
+
+```{python}
+import torch
+
+torch.__version__
+```
+

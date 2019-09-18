@@ -1,0 +1,98 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Source: https://www.r-exercises.com/2018/03/04/logistic-regression-in-tensorflow/
+
+
+Let’s illustrate the inverse logit. As you can see, it is the sigmoid function curve.
+
+```{r}
+library(ggplot2)
+
+y <- function(a){
+y = 1/(1 + exp(-a))
+}
+x = seq(-5,5,0.1)
+ggplot() + geom_point(aes(x = x, y = y(x)))
+```
+
+The first thing is to create the data frame:
+
+```{r}
+# create dataframe
+library(caret)
+
+## Loading required package: lattice
+
+## Warning: Installed Rcpp (0.12.14.5) different from Rcpp used to build dplyr (0.12.11).
+## Please reinstall dplyr to avoid random crashes or undefined behavior.
+
+library(MASS)
+
+cat = cats[c("Sex", "Bwt")]
+y = with(cat, model.matrix(~ Sex + 0))
+x = as.matrix(cat[,2])
+trainIndex = createDataPartition(x, 
+                       p=0.7, list=FALSE,times=1)
+ 
+x_train = as.matrix(x[trainIndex,])
+x_test = as.matrix(x[-trainIndex,])
+y_train = as.matrix(y[trainIndex,])
+y_test = as.matrix(y[-trainIndex,])
+```
+
+```{r}
+# placeholders for features and labels
+library(tensorflow)
+
+X <- tf$placeholder(tf$float32, shape(NULL, 1L))
+Y = tf$placeholder(tf$float32, shape(NULL, 2L), name = "Y")
+```
+
+```{r}
+# define the parameters
+W = tf$Variable(tf$random_normal(shape(1L,2L),stddev = 1.0), name = "weghts")
+b = tf$Variable(tf$zeros(shape(2L)), name = "bias")
+```
+
+
+```{r}
+# compute the logit
+logits = tf$add(tf$matmul(X, W), b)
+pred = tf$nn$sigmoid(logits)
+```
+
+
+```{r}
+# define the loss function
+entropy = tf$nn$sigmoid_cross_entropy_with_logits(labels = Y, logits = logits)
+loss = tf$reduce_mean(entropy)
+```
+
+
+```{r}
+# training
+optimizer = tf$train$GradientDescentOptimizer(learning_rate = 0.01)$minimize(loss)
+init_op = tf$global_variables_initializer()
+```
+
+
+```{r}
+# evaluate the model
+correct_prediction <- tf$equal(tf$argmax(pred, 1L), tf$argmax(Y, 1L))
+accuracy <- tf$reduce_mean(tf$cast(correct_prediction, tf$float32))
+```
+
+```{r}
+# execute the graph
+with(tf$Session() %as% sess, {
+  sess$run(init_op)
+  for (i in 1:1000) {
+    sess$run(optimizer,feed_dict = dict(X=x_train, Y=y_train))
+  }
+  sess$run(accuracy, feed_dict=dict(X = x_test, Y = y_test))
+})
+```
+

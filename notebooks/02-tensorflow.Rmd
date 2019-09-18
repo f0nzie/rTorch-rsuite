@@ -1,0 +1,164 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+> Too many tensorflow() errors
+
+```{r}
+library(tensorflow)
+library(tfestimators)
+
+tensorflow::tf_version()
+```
+
+```{python}
+import tensorflow as tf
+
+tf.__version__
+```
+
+
+Source: http://nandeshwar.info/data-science-2/deep-learning-tensorflow-r-tutorial/
+
+```{r}
+library(readr)
+library(dplyr)
+ 
+donor_data <- read_csv("https://www.dropbox.com/s/ntd5tbhr7fxmrr4/DonorSampleDataCleaned.csv?raw=1")
+
+
+```
+
+```{r}
+glimpse(donor_data)
+```
+
+```{r}
+# replace missing values
+
+# function copied from
+# https://stackoverflow.com/a/8189441/934898
+my_mode <- function(x) {
+    ux <- unique(x)
+    ux[which.max(tabulate(match(x, ux)))]
+}
+
+donor_data <- donor_data %>% 
+  mutate_if(is.numeric, 
+            .funs = funs(
+              ifelse(is.na(.), 
+                     median(., na.rm = TRUE),
+                     .))) %>%
+  mutate_if(is.character, 
+            .funs = funs(
+              ifelse(is.na(.), 
+                     my_mode(.),
+                     .)))
+```
+
+```{r}
+# character to factors
+predictor_cols <- c("MARITAL_STATUS", "GENDER", 
+                    "ALUMNUS_IND", "PARENT_IND", 
+                    "WEALTH_RATING", "PREF_ADDRESS_TYPE")
+ 
+# Convert feature to factor
+donor_data <- mutate_at(donor_data, 
+                        .vars = predictor_cols, 
+                        .funs = as.factor)
+```
+
+```{r eval=FALSE}
+feature_cols <- feature_columns(
+  column_indicator(
+    column_categorical_with_vocabulary_list(
+      "MARITAL_STATUS", 
+      vocabulary_list = unique(donor_data$MARITAL_STATUS))), 
+    column_indicator(
+      column_categorical_with_vocabulary_list(
+        "GENDER", 
+        vocabulary_list = unique(donor_data$GENDER))), 
+    column_indicator(
+      column_categorical_with_vocabulary_list(
+        "ALUMNUS_IND", 
+        vocabulary_list = unique(donor_data$ALUMNUS_IND))), 
+    column_indicator(
+      column_categorical_with_vocabulary_list(
+        "PARENT_IND", 
+        vocabulary_list = unique(donor_data$PARENT_IND))), 
+    column_indicator(
+      column_categorical_with_vocabulary_list(
+        "WEALTH_RATING", 
+        vocabulary_list = unique(donor_data$WEALTH_RATING))), 
+    column_indicator(
+      column_categorical_with_vocabulary_list(
+        "PREF_ADDRESS_TYPE", 
+        vocabulary_list = unique(donor_data$PREF_ADDRESS_TYPE))), 
+    column_numeric("AGE"))
+```
+
+```{r}
+#  let TensorFlow know about the column types
+feature_cols <- feature_columns(
+    tf$feature_column$categorical_column_with_vocabulary_list(
+      "MARITAL_STATUS",
+        vocabulary_list = unique(donor_data$MARITAL_STATUS)),
+    tf$feature_column$categorical_column_with_vocabulary_list(
+        "GENDER", 
+        vocabulary_list = unique(donor_data$GENDER)),
+    tf$feature_column$categorical_column_with_vocabulary_list(
+        "ALUMNUS_IND", 
+        vocabulary_list = unique(donor_data$ALUMNUS_IND)),
+    tf$feature_column$categorical_column_with_vocabulary_list(
+        "PARENT_IND", 
+        vocabulary_list = unique(donor_data$PARENT_IND)),
+    tf$feature_column$categorical_column_with_vocabulary_list(
+        "WEALTH_RATING", 
+        vocabulary_list = unique(donor_data$WEALTH_RATING)),
+    tf$feature_column$categorical_column_with_vocabulary_list(
+        "PREF_ADDRESS_TYPE", 
+        vocabulary_list = unique(donor_data$PREF_ADDRESS_TYPE)),
+    tf$feature_column$numeric_column("AGE")
+    
+    )
+
+feature_cols
+```
+
+```{r}
+# set into train and test datasets
+row_indices <- sample(1:nrow(donor_data), 
+                      size = 0.8 * nrow(donor_data))
+donor_data_train <- donor_data[row_indices, ]
+donor_data_test <- donor_data[-row_indices, ]
+```
+
+```{r}
+# create an input function with the listing of input and out variables
+donor_pred_fn <- function(data) {
+    input_fn(data, 
+             features = c("AGE", "MARITAL_STATUS", 
+                          "GENDER", "ALUMNUS_IND", 
+                          "PARENT_IND", "WEALTH_RATING", 
+                          "PREF_ADDRESS_TYPE"), 
+             response = "DONOR_IND")
+}
+```
+
+
+```{r}
+classifier <- dnn_classifier(
+  feature_columns = feature_cols, 
+  hidden_units = c(80, 40, 30), 
+  n_classes = 2, 
+  label_vocabulary = c("N", "Y"))
+```
+
+```{r}
+train(classifier, 
+      input_fn = donor_pred_fn(donor_data_train))
+
+
+```
+
