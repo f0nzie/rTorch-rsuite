@@ -6,3 +6,5 @@
 config.txt
 
 *.gz
+
+notebooks/*.nb.html
